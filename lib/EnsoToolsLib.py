@@ -20,7 +20,7 @@ def add_up_errors(list_keyerror):
     :return keyerror: string
         string of all encountered errors concatenated
     """
-    keyerror = ''
+    keyerror = ""
     for key in list_keyerror:
         if len(keyerror) > 0 and key is not None:
             keyerror += " ; "
@@ -48,18 +48,18 @@ def closest_grid(region, nlat, nlon):
     """
     res = [0.25, 0.50, 0.75, 1.00, 1.25, 1.50, 1.75, 2.00, 2.25, 2.50, 2.75]
     region_ref = ReferenceRegions(region)
-    lats = region_ref['latitude']
+    lats = region_ref["latitude"]
     dy = float(abs(max(lats) - min(lats))) / nlat
     lyy = [abs(dy - ii) for ii in res]
     lyy = res[lyy.index(min(lyy))]
-    lons = region_ref['longitude']
+    lons = region_ref["longitude"]
     dx = float(abs(max(lons) - min(lons))) / nlon
     lxx = [abs(dx - ii) for ii in res]
     lxx = res[lxx.index(min(lxx))]
     if lxx == lyy:
         grid = "generic_" + str(lxx) + "x" + str(lxx) + "deg"
     else:
-        dx = abs(lxx + lyy) / 2.
+        dx = abs(lxx + lyy) / 2.0
         lxx = [abs(dx - ii) for ii in res]
         lxx = res[lxx.index(min(lxx))]
         grid = "generic_" + str(lxx) + "x" + str(lxx) + "deg"

@@ -1,5 +1,3 @@
-
-
 from cdms2 import open as CDMS2open
 from copy import deepcopy
 from getpass import getuser as GETPASSgetuser
@@ -9,6 +7,7 @@ import json
 from os import environ as OSenviron
 from os.path import join as OSpath__join
 import sys
+
 # user (get your user name for the paths and to save the files)
 user_name = GETPASSgetuser()
 
@@ -17,8 +16,13 @@ user_name = GETPASSgetuser()
 sys.path.insert(0, "/home/" + user_name + "/Test001/ENSO_metrics/lib")
 sys.path.insert(0, "/home/" + user_name + "/Test001/ENSO_metrics/plots")
 sys.path.insert(1, "/home/" + user_name + "/Test001/ENSO_metrics/scripts")
-from EnsoMetrics.EnsoCollectionsLib import CmipVariables, defCollection, ReferenceObservations
+from EnsoMetrics.EnsoCollectionsLib import (
+    CmipVariables,
+    defCollection,
+    ReferenceObservations,
+)
 from EnsoMetrics.EnsoComputeMetricsLib import compute_collection
+
 # from EnsoCollectionsLib import CmipVariables, defCollection, ReferenceObservations
 # from EnsoComputeMetricsLib import compute_collection
 
@@ -28,114 +32,234 @@ sys.path.insert(0, "/home/yplanton/New_programs/lib_cmip_bash")
 from getfiles_sh_to_py import find_path_and_files
 from getfiles_sh_to_py import get_ensembles
 
-#---------------------------------------------------#
+
+# ---------------------------------------------------#
 # colors for printing
 class bcolors:
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-#---------------------------------------------------#
-
-xmldir = OSenviron['XMLDIR']
-#netcdf_path = '/data/yplanton/Eval_IPSL'
-netcdf_path = '/data/yplanton/ENSO_metrics/v20190805'
+    HEADER = "\033[95m"
+    OKBLUE = "\033[94m"
+    OKGREEN = "\033[92m"
+    WARNING = "\033[93m"
+    FAIL = "\033[91m"
+    ENDC = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
 
 
-def find_xml(name, frequency, variable, project='', experiment='', ensemble='', realm=''):
+# ---------------------------------------------------#
+
+xmldir = OSenviron["XMLDIR"]
+# netcdf_path = '/data/yplanton/Eval_IPSL'
+netcdf_path = "/data/yplanton/ENSO_metrics/v20190805"
+
+
+def find_xml(
+    name, frequency, variable, project="", experiment="", ensemble="", realm=""
+):
     list_obs = list(ReferenceObservations().keys())
     if name in list_obs:
-        file_name, file_area, file_land = find_xml_obs(name, frequency, variable)
+        file_name, file_area, file_land = find_xml_obs(
+            name, frequency, variable
+        )
     else:
-        file_name, file_area, file_land = find_xml_cmip(name, project, experiment, ensemble, frequency, realm, variable)
+        file_name, file_area, file_land = find_xml_cmip(
+            name, project, experiment, ensemble, frequency, realm, variable
+        )
     return file_name, file_area, file_land
 
 
-def find_xml_cmip(model, project, experiment, ensemble, frequency, realm, variable):
+def find_xml_cmip(
+    model, project, experiment, ensemble, frequency, realm, variable
+):
     try:
-        pathnc, filenc = find_path_and_files(ens=ensemble, exp=experiment, fre=frequency, mod=model, pro=project,
-                                             rea=realm, var=variable)
+        pathnc, filenc = find_path_and_files(
+            ens=ensemble,
+            exp=experiment,
+            fre=frequency,
+            mod=model,
+            pro=project,
+            rea=realm,
+            var=variable,
+        )
     except:
-        if realm == 'O':
-            new_realm = 'A'
-        elif realm == 'A':
-            new_realm = 'O'
+        if realm == "O":
+            new_realm = "A"
+        elif realm == "A":
+            new_realm = "O"
         # if var is not in realm 'O' (for ocean), look for it in realm 'A' (for atmosphere), and conversely
         try:
-            pathnc, filenc = find_path_and_files(ens=ensemble, exp=experiment, fre=frequency, mod=model, pro=project,
-                                                 rea=new_realm, var=variable)
+            pathnc, filenc = find_path_and_files(
+                ens=ensemble,
+                exp=experiment,
+                fre=frequency,
+                mod=model,
+                pro=project,
+                rea=new_realm,
+                var=variable,
+            )
         except:
             # given variable is neither in realm 'A' nor 'O'
-            print(bcolors.FAIL + '%%%%%     -----     %%%%%')
-            print('ERROR: function: ' + str(INSPECTstack()[0][3]) + ', line: ' + str(INSPECTstack()[0][2]))
-            print('given variable cannot be found in either realm A or O: ' + str(variable))
-            print('param: ' + str(model) + ', '+str(project) + ', ' + str(experiment) + ', ' + str(ensemble) + ', ' +\
-                  str(frequency) + ', ' + str(realm))
-            print('%%%%%     -----     %%%%%' + bcolors.ENDC)
-            sys.exit('')
-        file_area, file_land = find_fx(model, project=project, experiment=experiment, ensemble=ensemble,
-                                       realm=new_realm)
+            print(bcolors.FAIL + "%%%%%     -----     %%%%%")
+            print(
+                "ERROR: function: "
+                + str(INSPECTstack()[0][3])
+                + ", line: "
+                + str(INSPECTstack()[0][2])
+            )
+            print(
+                "given variable cannot be found in either realm A or O: "
+                + str(variable)
+            )
+            print(
+                "param: "
+                + str(model)
+                + ", "
+                + str(project)
+                + ", "
+                + str(experiment)
+                + ", "
+                + str(ensemble)
+                + ", "
+                + str(frequency)
+                + ", "
+                + str(realm)
+            )
+            print("%%%%%     -----     %%%%%" + bcolors.ENDC)
+            sys.exit("")
+        file_area, file_land = find_fx(
+            model,
+            project=project,
+            experiment=experiment,
+            ensemble=ensemble,
+            realm=new_realm,
+        )
     else:
-        file_area, file_land = find_fx(model, project=project, experiment=experiment, ensemble=ensemble, realm=realm)
+        file_area, file_land = find_fx(
+            model,
+            project=project,
+            experiment=experiment,
+            ensemble=ensemble,
+            realm=realm,
+        )
     file_name = OSpath__join(pathnc, filenc[0])
     return file_name, file_area, file_land
 
 
-def find_fx(model, project='', experiment='', ensemble='', realm=''):
-    if project in ['CMIP5', 'CMIP6']:
-        if project in ['CMIP5']:
-            my_ens = 'r0i0p0'
+def find_fx(model, project="", experiment="", ensemble="", realm=""):
+    if project in ["CMIP5", "CMIP6"]:
+        if project in ["CMIP5"]:
+            my_ens = "r0i0p0"
         else:
             my_ens = deepcopy(ensemble)
-        if realm == 'A':
-            farea1, farea2 = find_path_and_files(ens=my_ens, exp=experiment, fre='fx', mod=model, pro=project,
-                                                 rea=realm, var='areacella')
-            fland1, fland2 = find_path_and_files(ens=my_ens, exp=experiment, fre='fx', mod=model, pro=project,
-                                                 rea=realm, var='sftlf')
+        if realm == "A":
+            farea1, farea2 = find_path_and_files(
+                ens=my_ens,
+                exp=experiment,
+                fre="fx",
+                mod=model,
+                pro=project,
+                rea=realm,
+                var="areacella",
+            )
+            fland1, fland2 = find_path_and_files(
+                ens=my_ens,
+                exp=experiment,
+                fre="fx",
+                mod=model,
+                pro=project,
+                rea=realm,
+                var="sftlf",
+            )
             file_land = OSpath__join(fland1, fland2[0])
-        elif realm == 'O':
-            farea1, farea2 = find_path_and_files(ens=my_ens, exp=experiment, fre='fx', mod=model, pro=project,
-                                                 rea=realm, var='areacello')
+        elif realm == "O":
+            farea1, farea2 = find_path_and_files(
+                ens=my_ens,
+                exp=experiment,
+                fre="fx",
+                mod=model,
+                pro=project,
+                rea=realm,
+                var="areacello",
+            )
             file_land = None
         file_area = OSpath__join(farea1, farea2[0])
     else:
-        file_area, file_land = find_xml_fx(model, project=project, experiment=experiment, realm=realm)
-    try: CDMS2open(file_area)
-    except: file_area = None
-    try: CDMS2open(file_land)
-    except: file_land = None
+        file_area, file_land = find_xml_fx(
+            model, project=project, experiment=experiment, realm=realm
+        )
+    try:
+        CDMS2open(file_area)
+    except:
+        file_area = None
+    try:
+        CDMS2open(file_land)
+    except:
+        file_land = None
     return file_area, file_land
 
 
-def find_xml_fx(name, project='', experiment='', realm=''):
+def find_xml_fx(name, project="", experiment="", realm=""):
     list_obs = list(ReferenceObservations().keys())
     if name in list_obs:
-        file_area = OSpath__join(xmldir, 'obs_' + str(name) + '_areacell.xml')
-        file_land = OSpath__join(xmldir, 'obs_' + str(name) + '_landmask.xml')
+        file_area = OSpath__join(xmldir, "obs_" + str(name) + "_areacell.xml")
+        file_land = OSpath__join(xmldir, "obs_" + str(name) + "_landmask.xml")
     else:
-        file_area = OSpath__join(xmldir, str(name) + '_' + str(project) + '_' + str(experiment) + '_r0i0p0_glob_fx_'
-                                 + str(realm) + '_areacell.xml')
-        file_land = OSpath__join(xmldir, str(name) + '_' + str(project) + '_' + str(experiment) + '_r0i0p0_glob_fx_'
-                                 + str(realm) + '_landmask.xml')
+        file_area = OSpath__join(
+            xmldir,
+            str(name)
+            + "_"
+            + str(project)
+            + "_"
+            + str(experiment)
+            + "_r0i0p0_glob_fx_"
+            + str(realm)
+            + "_areacell.xml",
+        )
+        file_land = OSpath__join(
+            xmldir,
+            str(name)
+            + "_"
+            + str(project)
+            + "_"
+            + str(experiment)
+            + "_r0i0p0_glob_fx_"
+            + str(realm)
+            + "_landmask.xml",
+        )
     return file_area, file_land
 
 
 def find_xml_obs(obs, frequency, variable):
-    if obs == 'HadISST':
-        file_name = OSpath__join(xmldir, 'obs_' + str(obs) + 'v1.1.xml')
+    if obs == "HadISST":
+        file_name = OSpath__join(xmldir, "obs_" + str(obs) + "v1.1.xml")
     else:
-        file_name = OSpath__join(xmldir, 'obs_' + str(obs) + '.xml')
+        file_name = OSpath__join(xmldir, "obs_" + str(obs) + ".xml")
     xml = CDMS2open(file_name)
     listvar1 = sorted(xml.listvariables())
     if variable not in listvar1:
-        print('\033[95m' + str().ljust(5) + "obs var " + str(variable) + " cannot be found" + '\033[0m')
-        print('\033[95m' + str().ljust(10) + "file_name = " + str(file_name) + '\033[0m')
-        print('\033[95m' + str().ljust(10) + "variables = " + str(listvar1) + '\033[0m')
-        sys.exit('')
+        print(
+            "\033[95m"
+            + str().ljust(5)
+            + "obs var "
+            + str(variable)
+            + " cannot be found"
+            + "\033[0m"
+        )
+        print(
+            "\033[95m"
+            + str().ljust(10)
+            + "file_name = "
+            + str(file_name)
+            + "\033[0m"
+        )
+        print(
+            "\033[95m"
+            + str().ljust(10)
+            + "variables = "
+            + str(listvar1)
+            + "\033[0m"
+        )
+        sys.exit("")
     file_area, file_land = find_fx(obs)
     return file_name, file_area, file_land
 
@@ -143,97 +267,129 @@ def find_xml_obs(obs, frequency, variable):
 def save_json(dict_in, json_name, metric_only=True):
     # reshape dictionary
     liste = sorted(dict_in.keys())
-    listm = sorted(dict_in[liste[0]]['value'].keys())
+    listm = sorted(dict_in[liste[0]]["value"].keys())
     dict_out = dict()
     for met in listm:
         dict1 = dict()
         for ens in liste:
             # metadata (nyears)
             dict_meta = dict()
-            for key1 in list(dict_in[ens]['metadata']['metrics'][met]['diagnostic'].keys()):
-                if key1 not in ['time_frequency', 'ref', 'method', 'method_nonlinearity', 'name']:
+            for key1 in list(
+                dict_in[ens]["metadata"]["metrics"][met]["diagnostic"].keys()
+            ):
+                if key1 not in [
+                    "time_frequency",
+                    "ref",
+                    "method",
+                    "method_nonlinearity",
+                    "name",
+                ]:
                     if key1 == "units":
-                        dict_meta[key1] = dict_in[ens]['metadata']['metrics'][met]['diagnostic'][key1]
+                        dict_meta[key1] = dict_in[ens]["metadata"]["metrics"][
+                            met
+                        ]["diagnostic"][key1]
                     else:
-                        dict_meta[key1] = dict_in[ens]['metadata']['metrics'][met]['diagnostic'][key1]['nyears']
-            units = dict_in[ens]['metadata']['metrics'][met]['metric']['units']
+                        dict_meta[key1] = dict_in[ens]["metadata"]["metrics"][
+                            met
+                        ]["diagnostic"][key1]["nyears"]
+            units = dict_in[ens]["metadata"]["metrics"][met]["metric"]["units"]
             if metric_only is True:
                 # metrics
                 dict2 = dict()
-                for key1 in list(dict_in[ens]['value'][met]['metric'].keys()):
-                    tmp = dict_in[ens]['value'][met]['metric'][key1]['value']
+                for key1 in list(dict_in[ens]["value"][met]["metric"].keys()):
+                    tmp = dict_in[ens]["value"][met]["metric"][key1]["value"]
                     tmp_key = key1.replace("ref_", "")
-                    dict2[tmp_key] = {'metric': tmp, 'nyears_obs': dict_meta[tmp_key], 'units': units}
+                    dict2[tmp_key] = {
+                        "metric": tmp,
+                        "nyears_obs": dict_meta[tmp_key],
+                        "units": units,
+                    }
                     del tmp, tmp_key
             else:
                 # metrics
-                dict2 = {'metric': {}, 'diagnostic': {}}
-                for key1 in list(dict_in[ens]['value'][met]['metric'].keys()):
-                    tmp = dict_in[ens]['value'][met]['metric'][key1]['value']
+                dict2 = {"metric": {}, "diagnostic": {}}
+                for key1 in list(dict_in[ens]["value"][met]["metric"].keys()):
+                    tmp = dict_in[ens]["value"][met]["metric"][key1]["value"]
                     tmp_key = key1.replace("ref_", "")
-                    dict2['metric'][tmp_key] = {'value': tmp, 'nyears_obs': dict_meta[tmp_key], 'units': units}
+                    dict2["metric"][tmp_key] = {
+                        "value": tmp,
+                        "nyears_obs": dict_meta[tmp_key],
+                        "units": units,
+                    }
                     del tmp, tmp_key
                 # dive down diagnostics
-                for key1 in list(dict_in[ens]['value'][met]['diagnostic'].keys()):
-                    tmp = dict_in[ens]['value'][met]['diagnostic'][key1]['value']
-                    if key1 == 'model':
-                        dict2['diagnostic'][ens] = \
-                            {'value': tmp, 'nyears': dict_meta[key1], 'units': dict_meta['units']}
+                for key1 in list(
+                    dict_in[ens]["value"][met]["diagnostic"].keys()
+                ):
+                    tmp = dict_in[ens]["value"][met]["diagnostic"][key1][
+                        "value"
+                    ]
+                    if key1 == "model":
+                        dict2["diagnostic"][ens] = {
+                            "value": tmp,
+                            "nyears": dict_meta[key1],
+                            "units": dict_meta["units"],
+                        }
                     else:
-                        dict2['diagnostic'][key1] = \
-                            {'value': tmp, 'nyears': dict_meta[key1], 'units': dict_meta['units']}
+                        dict2["diagnostic"][key1] = {
+                            "value": tmp,
+                            "nyears": dict_meta[key1],
+                            "units": dict_meta["units"],
+                        }
                     del tmp
             dict1[ens] = dict2
             del dict_meta, dict2
         dict_out[met] = dict1
         del dict1
     # save as json file
-    with open(json_name + '.json', 'w') as outfile:
+    with open(json_name + ".json", "w") as outfile:
         json.dump(dict_out, outfile, sort_keys=True)
     return
 
+
 # metric collection
-mc_name = 'ENSO_proc'#'ENSO_tel'#'ENSO_proc'#'MC1'#
+mc_name = "ENSO_proc"  #'ENSO_tel'#'ENSO_proc'#'MC1'#
 dict_mc = defCollection(mc_name)
-list_metric = sorted(dict_mc['metrics_list'].keys())
+list_metric = sorted(dict_mc["metrics_list"].keys())
 
 # parameters
-project = 'CMIP5'#'CMIP6'
-experiment = 'hist'
-frequency = 'mon'
-realm = 'A'
+project = "CMIP5"  #'CMIP6'
+experiment = "hist"
+frequency = "mon"
+realm = "A"
 
 # list of variables
 list_variables = list()
 for metric in list_metric:
-    listvar = dict_mc['metrics_list'][metric]['variables']
+    listvar = dict_mc["metrics_list"][metric]["variables"]
     for var in listvar:
         if var not in list_variables:
             list_variables.append(var)
 list_variables = sorted(list_variables)
-print('\033[95m' + str(list_variables) + '\033[0m')
+print("\033[95m" + str(list_variables) + "\033[0m")
 
 # list of observations
 list_obs = list()
 for metric in list_metric:
-    dict_var_obs = dict_mc['metrics_list'][metric]['obs_name']
+    dict_var_obs = dict_mc["metrics_list"][metric]["obs_name"]
     for var in list(dict_var_obs.keys()):
         for obs in dict_var_obs[var]:
             if obs not in list_obs:
                 list_obs.append(obs)
 list_obs = sorted(list_obs)
-if mc_name == 'MC1':
-    list_obs = ['Tropflux']
-elif mc_name == 'ENSO_perf':
-    list_obs = ['ERA-Interim']#['ERA-Interim', 'HadISST', 'Tropflux', 'GPCPv2.3']#['Tropflux','GPCPv2.3']#['HadISST']#
-elif mc_name == 'ENSO_tel':
-    list_obs = ['ERA-Interim']#['ERA-Interim', 'HadISST', 'GPCPv2.3']
-elif mc_name == 'ENSO_proc':
-    list_obs = ['ERA-Interim']#['ERA-Interim', 'HadISST', 'GPCPv2.3']
-elif mc_name == 'ENSO_test':
-    list_obs = ['AVISO', 'ERA-Interim', 'HadISST', 'Tropflux', 'GPCPv2.3']
-print('\033[95m' + str(list_obs) + '\033[0m')
-
+if mc_name == "MC1":
+    list_obs = ["Tropflux"]
+elif mc_name == "ENSO_perf":
+    list_obs = [
+        "ERA-Interim"
+    ]  # ['ERA-Interim', 'HadISST', 'Tropflux', 'GPCPv2.3']#['Tropflux','GPCPv2.3']#['HadISST']#
+elif mc_name == "ENSO_tel":
+    list_obs = ["ERA-Interim"]  # ['ERA-Interim', 'HadISST', 'GPCPv2.3']
+elif mc_name == "ENSO_proc":
+    list_obs = ["ERA-Interim"]  # ['ERA-Interim', 'HadISST', 'GPCPv2.3']
+elif mc_name == "ENSO_test":
+    list_obs = ["AVISO", "ERA-Interim", "HadISST", "Tropflux", "GPCPv2.3"]
+print("\033[95m" + str(list_obs) + "\033[0m")
 
 #
 # finding file and variable name in file for each observations dataset
@@ -241,7 +397,7 @@ print('\033[95m' + str(list_obs) + '\033[0m')
 dict_obs = dict()
 for obs in list_obs:
     # @jiwoo: be sure to add your datasets to EnsoCollectionsLib.ReferenceObservations if needed
-    dict_var = ReferenceObservations(obs)['variable_name_in_file']
+    dict_var = ReferenceObservations(obs)["variable_name_in_file"]
     dict_obs[obs] = dict()
     for var in list_variables:
         #
@@ -253,54 +409,82 @@ for obs in list_obs:
         # I usually alias the variable names from observations and models in the xml in order to have the same name
         # for sst (or any other variable) in every xml. This way I don not need to go through this function to know the
         # variable name in file
-        try: var_in_file = dict_var[var]['var_name']
+        try:
+            var_in_file = dict_var[var]["var_name"]
         except:
-            print('\033[95m' + str(var) + " is not available for " + str(obs) + " or unscripted" + '\033[0m')
+            print(
+                "\033[95m"
+                + str(var)
+                + " is not available for "
+                + str(obs)
+                + " or unscripted"
+                + "\033[0m"
+            )
         else:
             try:
-                areacell_in_file = dict_var['areacell']['var_name']
+                areacell_in_file = dict_var["areacell"]["var_name"]
             except:
                 areacell_in_file = None
             try:
-                landmask_in_file = dict_var['landmask']['var_name']
+                landmask_in_file = dict_var["landmask"]["var_name"]
             except:
                 landmask_in_file = None
             if isinstance(var_in_file, list):
-                list_areacell, list_files, list_landmask, list_name_area, list_name_land = \
-                    list(), list(), list(), list(), list()
+                (
+                    list_areacell,
+                    list_files,
+                    list_landmask,
+                    list_name_area,
+                    list_name_land,
+                ) = (list(), list(), list(), list(), list())
                 for var1 in var_in_file:
-                    file_name, file_areacell, file_landmask = find_xml(obs, frequency, var1)
+                    file_name, file_areacell, file_landmask = find_xml(
+                        obs, frequency, var1
+                    )
                     list_files.append(file_name)
                     list_areacell.append(file_areacell)
                     list_name_area.append(areacell_in_file)
                     list_landmask.append(file_landmask)
                     list_name_land.append(landmask_in_file)
             else:
-                file_name, file_areacell, file_landmask = find_xml(obs, frequency, var_in_file)
+                file_name, file_areacell, file_landmask = find_xml(
+                    obs, frequency, var_in_file
+                )
                 list_files = file_name
                 list_areacell = file_areacell
                 list_name_area = areacell_in_file
                 list_landmask = file_landmask
                 list_name_land = landmask_in_file
-            dict_obs[obs][var] = {'path + filename': list_files, 'varname': var_in_file,
-                                  'path + filename_area': list_areacell, 'areaname': list_name_area,
-                                  'path + filename_landmask': list_landmask, 'landmaskname': list_name_land}
+            dict_obs[obs][var] = {
+                "path + filename": list_files,
+                "varname": var_in_file,
+                "path + filename_area": list_areacell,
+                "areaname": list_name_area,
+                "path + filename_landmask": list_landmask,
+                "landmaskname": list_name_land,
+            }
 
 # models
-list_models = ['IPSL-CM5B-LR']#['CNRM-CM5']#['IPSL-CM5A-LR', 'IPSL-CM5A-MR', 'IPSL-CM5B-LR']#['IPSL-CM6A-LR']#
+list_models = [
+    "IPSL-CM5B-LR"
+]  # ['CNRM-CM5']#['IPSL-CM5A-LR', 'IPSL-CM5A-MR', 'IPSL-CM5B-LR']#['IPSL-CM6A-LR']#
 #
 # finding file and variable name in file for each observations dataset
 #
 dict_metric = dict()
-dict_var = CmipVariables()['variable_name_in_file']
+dict_var = CmipVariables()["variable_name_in_file"]
 for mod in list_models:
-    list_ens = ['r1i1p1']#get_ensembles(exp=experiment, fre=frequency, mod=mod, pro=project, rea=realm)
-    pattern_out = OSpath__join(netcdf_path, user_name + '_' + mc_name + '_' + mod + '_' + experiment)
-    files_in = list(GLOBiglob(pattern_out + '*.json'))
-    #list_ens = list_ens[len(files_in):]
+    list_ens = [
+        "r1i1p1"
+    ]  # get_ensembles(exp=experiment, fre=frequency, mod=mod, pro=project, rea=realm)
+    pattern_out = OSpath__join(
+        netcdf_path, user_name + "_" + mc_name + "_" + mod + "_" + experiment
+    )
+    files_in = list(GLOBiglob(pattern_out + "*.json"))
+    # list_ens = list_ens[len(files_in):]
     dict_ens = dict()
     for ens in list_ens:
-        dict_mod = {mod + '_' + ens: {}}
+        dict_mod = {mod + "_" + ens: {}}
         # ------------------------------------------------
         # @jiwoo: between these dash the program is a bit ad hoc...
         # it works well for me because I am looking for sst and taux on the ocean grid, and fluxes [lhf, lwr, swr, shf, thf]
@@ -311,48 +495,81 @@ for mod in list_models:
             #
             # finding variable name in file
             #
-            var_in_file = dict_var[var]['var_name']
+            var_in_file = dict_var[var]["var_name"]
             try:
-                areacell_in_file = dict_var['areacell']['var_name']
+                areacell_in_file = dict_var["areacell"]["var_name"]
             except:
                 areacell_in_file = None
             try:
-                landmask_in_file = dict_var['landmask']['var_name']
+                landmask_in_file = dict_var["landmask"]["var_name"]
             except:
                 landmask_in_file = None
             if isinstance(var_in_file, list):
-                list_areacell, list_files, list_landmask, list_name_area, list_name_land = \
-                    list(), list(), list(), list(), list()
+                (
+                    list_areacell,
+                    list_files,
+                    list_landmask,
+                    list_name_area,
+                    list_name_land,
+                ) = (list(), list(), list(), list(), list())
                 for var1 in var_in_file:
-                    file_name, file_areacell, file_landmask = \
-                        find_xml(mod, frequency, var1, project=project, experiment=experiment, ensemble=ens,
-                                 realm=realm)
+                    file_name, file_areacell, file_landmask = find_xml(
+                        mod,
+                        frequency,
+                        var1,
+                        project=project,
+                        experiment=experiment,
+                        ensemble=ens,
+                        realm=realm,
+                    )
                     list_files.append(file_name)
                     list_areacell.append(file_areacell)
                     list_name_area.append(areacell_in_file)
                     list_landmask.append(file_landmask)
                     list_name_land.append(landmask_in_file)
             else:
-                file_name, file_areacell, file_landmask = \
-                    find_xml(mod, frequency, var_in_file, project=project, experiment=experiment, ensemble=ens,
-                             realm=realm)
+                file_name, file_areacell, file_landmask = find_xml(
+                    mod,
+                    frequency,
+                    var_in_file,
+                    project=project,
+                    experiment=experiment,
+                    ensemble=ens,
+                    realm=realm,
+                )
                 list_files = file_name
                 list_areacell = file_areacell
                 list_name_area = areacell_in_file
                 list_landmask = file_landmask
                 list_name_land = landmask_in_file
-            dict_mod[mod + '_' + ens][var] =\
-                {'path + filename': list_files, 'varname': var_in_file, 'path + filename_area': list_areacell,
-                 'areaname': list_name_area, 'path + filename_landmask': list_landmask, 'landmaskname': list_name_land}
-            del areacell_in_file, file_areacell, file_landmask, file_name, landmask_in_file, list_areacell, list_files,\
-                list_landmask, list_name_area, list_name_land, var_in_file
+            dict_mod[mod + "_" + ens][var] = {
+                "path + filename": list_files,
+                "varname": var_in_file,
+                "path + filename_area": list_areacell,
+                "areaname": list_name_area,
+                "path + filename_landmask": list_landmask,
+                "landmaskname": list_name_land,
+            }
+            del (
+                areacell_in_file,
+                file_areacell,
+                file_landmask,
+                file_name,
+                landmask_in_file,
+                list_areacell,
+                list_files,
+                list_landmask,
+                list_name_area,
+                list_name_land,
+                var_in_file,
+            )
             # dictionary needed by EnsoMetrics.ComputeMetricsLib.compute_collection
             # @jiwoo the compute_collection function it still on development and it does not read the observations requirement
             # defined in the metric collection, i.e., defCollection(mc_name)['metrics_list']['<metric name>']['obs_name']
             # so the function does not take a specific obs to compute the metric so for every obs in 'dict_obs' we must include
             # every variables needed by the metric collection [lhf, lwr, swr, shf, sst, taux, thf] even if its coming from
             # another dataset
-        dictDatasets = {'model': dict_mod, 'observations': dict_obs}
+        dictDatasets = {"model": dict_mod, "observations": dict_obs}
         # regridding dictionary (only if you want to specify the regridding)
         dict_regrid = {}
         # dict_regrid = {
@@ -361,14 +578,36 @@ for mod in list_models:
         #         'newgrid_name': 'generic 1x1deg'},
         # }
         # Computes the metric collection
-        netcdf_name = user_name + '_' + mc_name + '_' + mod + '_' + experiment + '_' + ens
-        netcdf = pattern_out + '_' + ens #OSpath__join(netcdf_path, netcdf_name)
-        dict_ens[mod + '_' + ens] =\
-            compute_collection(mc_name, dictDatasets, mod + '_' + ens, netcdf=True, netcdf_name=netcdf, debug=False)
+        netcdf_name = (
+            user_name
+            + "_"
+            + mc_name
+            + "_"
+            + mod
+            + "_"
+            + experiment
+            + "_"
+            + ens
+        )
+        netcdf = (
+            pattern_out + "_" + ens
+        )  # OSpath__join(netcdf_path, netcdf_name)
+        dict_ens[mod + "_" + ens] = compute_collection(
+            mc_name,
+            dictDatasets,
+            mod + "_" + ens,
+            netcdf=True,
+            netcdf_name=netcdf,
+            debug=False,
+        )
         # save json
-        save_json({mod + '_' + ens: dict_ens[mod + '_' + ens]}, netcdf, metric_only=True)
-        with open(netcdf + '_raw.json', 'w') as outfile:
-            json.dump(dict_ens[mod + '_' + ens], outfile, sort_keys=True)
+        save_json(
+            {mod + "_" + ens: dict_ens[mod + "_" + ens]},
+            netcdf,
+            metric_only=True,
+        )
+        with open(netcdf + "_raw.json", "w") as outfile:
+            json.dump(dict_ens[mod + "_" + ens], outfile, sort_keys=True)
         del dict_mod, dict_regrid, dictDatasets, netcdf, netcdf_name
     dict_metric[mod] = dict_ens
     del dict_ens, files_in, list_ens, pattern_out

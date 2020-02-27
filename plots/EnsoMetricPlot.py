@@ -2,33 +2,69 @@
 from copy import deepcopy
 from datetime import datetime
 from os.path import join as OSpath__join
+
 # ENSO_metrics functions
-#from EnsoPlotLib import plot_param
+# from EnsoPlotLib import plot_param
 from EnsoMetrics.EnsoPlotLib import plot_param
-from EnsoPlotTemplate import my_boxplot, my_curve, my_dotplot, my_dot_to_box, my_hovmoeller, my_map, my_scatterplot
+from EnsoPlotTemplate import (
+    my_boxplot,
+    my_curve,
+    my_dotplot,
+    my_dot_to_box,
+    my_hovmoeller,
+    my_map,
+    my_scatterplot,
+)
+
+dict_plot = {
+    "boxplot": my_boxplot,
+    "curve": my_curve,
+    "dot": my_dotplot,
+    "dot_to_box": my_dot_to_box,
+    "hovmoeller": my_hovmoeller,
+    "map": my_map,
+    "scatterplot": my_scatterplot,
+}
 
 
-dict_plot = {"boxplot": my_boxplot, "curve": my_curve, "dot": my_dotplot, "dot_to_box": my_dot_to_box,
-             "hovmoeller": my_hovmoeller, "map": my_map, "scatterplot": my_scatterplot}
-
-
-def main_plotter(metric_collection, metric, model, experiment, filename_nc, diagnostic_values,
-                 diagnostic_units, metric_values, metric_units, path_png=None, name_png=None, models2=None, shading=False):
+def main_plotter(
+    metric_collection,
+    metric,
+    model,
+    experiment,
+    filename_nc,
+    diagnostic_values,
+    diagnostic_units,
+    metric_values,
+    metric_units,
+    path_png=None,
+    name_png=None,
+    models2=None,
+    shading=False,
+):
     dict_param = plot_param(metric_collection, metric)
-    list_var = dict_param['metric_variables']
-    met_type = dict_param['metric_computation']
-    reference = dict_param['metric_reference']
-    dict_reg = dict_param['metric_regions']
+    list_var = dict_param["metric_variables"]
+    met_type = dict_param["metric_computation"]
+    reference = dict_param["metric_reference"]
+    dict_reg = dict_param["metric_regions"]
     if isinstance(diagnostic_units, str) is True:
-        diagnostic_units = diagnostic_units.replace("C", "$^\circ$C").replace("long", "$^\circ$long")
+        diagnostic_units = diagnostic_units.replace("C", "$^\circ$C").replace(
+            "long", "$^\circ$long"
+        )
     elif isinstance(diagnostic_units, list) is True:
         for ii, uni in enumerate(diagnostic_units):
-            diagnostic_units[ii] = uni.replace("C", "$^\circ$C").replace("long", "$^\circ$long")
+            diagnostic_units[ii] = uni.replace("C", "$^\circ$C").replace(
+                "long", "$^\circ$long"
+            )
     if isinstance(metric_units, str) is True:
-        metric_units = metric_units.replace("C", "$^\circ$C").replace("long", "$^\circ$long")
+        metric_units = metric_units.replace("C", "$^\circ$C").replace(
+            "long", "$^\circ$long"
+        )
     elif isinstance(metric_units, list) is True:
         for ii, uni in enumerate(metric_units):
-            metric_units[ii] = uni.replace("C", "$^\circ$C").replace("long", "$^\circ$long")
+            metric_units[ii] = uni.replace("C", "$^\circ$C").replace(
+                "long", "$^\circ$long"
+            )
     if isinstance(name_png, str) is False:
         name_png = metric_collection + "_" + metric + "_" + experiment + "_"
         if isinstance(model, str):
@@ -38,39 +74,79 @@ def main_plotter(metric_collection, metric, model, experiment, filename_nc, diag
         else:
             name_png = name_png + str(len(model)) + "models"
     # diagnostic
-    dict_diag = dict_param['diagnostic']
+    dict_diag = dict_param["diagnostic"]
     if isinstance(path_png, str):
         fig_name = OSpath__join(path_png, name_png + "_diagnostic")
     else:
         fig_name = deepcopy(name_png)
-    plt_typ = dict_diag['plot_type']
+    plt_typ = dict_diag["plot_type"]
     if plt_typ == "dot" and shading is True:
         plt_typ = "dot_to_box"
     t1 = datetime.now()
-    print(str().ljust(20) + plt_typ + " " + str(t1.hour).zfill(2) + ":" + str(t1.minute).zfill(2))
+    print(
+        str().ljust(20)
+        + plt_typ
+        + " "
+        + str(t1.hour).zfill(2)
+        + ":"
+        + str(t1.minute).zfill(2)
+    )
     dict_plot[plt_typ](
-        model, filename_nc, dict_diag, reference, list_var, fig_name + "_divedown01", models2=models2,
-        metric_type=met_type, metric_values=metric_values, metric_units=metric_units,
-        diagnostic_values=diagnostic_values, diagnostic_units=diagnostic_units, regions=dict_reg, shading=shading)
+        model,
+        filename_nc,
+        dict_diag,
+        reference,
+        list_var,
+        fig_name + "_divedown01",
+        models2=models2,
+        metric_type=met_type,
+        metric_values=metric_values,
+        metric_units=metric_units,
+        diagnostic_values=diagnostic_values,
+        diagnostic_units=diagnostic_units,
+        regions=dict_reg,
+        shading=shading,
+    )
     dt = datetime.now() - t1
-    dt = str(int(round(dt.seconds / 60.)))
+    dt = str(int(round(dt.seconds / 60.0)))
     print(str().ljust(30) + "took " + dt + " minute(s)")
     # dive downs
-    list_dd = sorted([key for key in list(dict_param.keys()) if "dive_down" in key], key=lambda v: v.upper())
+    list_dd = sorted(
+        [key for key in list(dict_param.keys()) if "dive_down" in key],
+        key=lambda v: v.upper(),
+    )
     for ii, dd in enumerate(list_dd):
         dict_diag = dict_param[dd]
-        plt_typ = dict_diag['plot_type']
+        plt_typ = dict_diag["plot_type"]
         t1 = datetime.now()
-        print(str().ljust(20) + plt_typ + " " + str(t1.hour).zfill(2) + ":" + str(t1.minute).zfill(2))
+        print(
+            str().ljust(20)
+            + plt_typ
+            + " "
+            + str(t1.hour).zfill(2)
+            + ":"
+            + str(t1.minute).zfill(2)
+        )
         if metric_collection == "ENSO_tel" and "Map" in metric:
             metype = deepcopy(met_type)
         else:
             metype = None
         dict_plot[plt_typ](
-            model, filename_nc, dict_diag, reference, list_var, fig_name + "_divedown" + str(ii+2).zfill(2),
-            models2=models2, metric_type=metype, metric_values=metric_values, metric_units=metric_units,
-            diagnostic_values=diagnostic_values, diagnostic_units=diagnostic_units, regions=dict_reg, shading=shading)
+            model,
+            filename_nc,
+            dict_diag,
+            reference,
+            list_var,
+            fig_name + "_divedown" + str(ii + 2).zfill(2),
+            models2=models2,
+            metric_type=metype,
+            metric_values=metric_values,
+            metric_units=metric_units,
+            diagnostic_values=diagnostic_values,
+            diagnostic_units=diagnostic_units,
+            regions=dict_reg,
+            shading=shading,
+        )
         dt = datetime.now() - t1
-        dt = str(int(round(dt.seconds / 60.)))
+        dt = str(int(round(dt.seconds / 60.0)))
         print(str().ljust(30) + "took " + dt + " minute(s)")
-

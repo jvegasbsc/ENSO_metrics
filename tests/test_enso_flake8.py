@@ -5,7 +5,6 @@ import shlex
 
 
 class TestFlake8(unittest.TestCase):
-
     def testFlake8(self):
         pth = os.path.dirname(__file__)
         pth = os.path.join(pth, "..")
@@ -22,11 +21,16 @@ class TestFlake8(unittest.TestCase):
         print()
         print()
         print()
-        #P = subprocess.Popen(shlex.split("flake8 --show-source --statistics --ignore=F999,F405,E121,E123,E126,E226,E24,E704 --max-line-length=120 %s" % pth),
-        P = subprocess.Popen(shlex.split("flake8 --show-source --statistics --max-line-length=120 %s" % pth),
-                             stdin=subprocess.PIPE,
-                             stdout=subprocess.PIPE,
-                             stderr=subprocess.PIPE)
+        # P = subprocess.Popen(shlex.split("flake8 --show-source --statistics --ignore=F999,F405,E121,E123,E126,E226,E24,E704 --max-line-length=120 %s" % pth),
+        P = subprocess.Popen(
+            shlex.split(
+                "flake8 --show-source --statistics --max-line-length=120 %s"
+                % pth
+            ),
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
         P.wait()
         out = P.stdout.read()
         if out != "":
