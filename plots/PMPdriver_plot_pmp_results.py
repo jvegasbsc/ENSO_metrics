@@ -8,7 +8,7 @@
 # ---------------------------------------------------#
 # Import the right packages
 # ---------------------------------------------------#
-from __future__ import print_function
+
 from glob import iglob as GLOBiglob
 import json
 from os.path import join as OSpath__join
@@ -56,7 +56,7 @@ with open(filename_js) as ff:
 ff.close()
 del ff, filename_js
 # loop on metrics
-metrics = sorted(defCollection(metric_collection)['metrics_list'].keys(), key=lambda v: v.upper())
+metrics = sorted(list(defCollection(metric_collection)['metrics_list'].keys()), key=lambda v: v.upper())
 for met in metrics:
     print('met:', met)
     # get NetCDF file name
@@ -76,11 +76,11 @@ for met in metrics:
         # get diagnostic values for the given model and observations
         if metric_collection == "ENSO_tel" and "Map" in met:
             dict_dia = data_json["value"][met+"Corr"]["diagnostic"]
-            diagnostic_values = dict((key1, None) for key1 in dict_dia.keys())
+            diagnostic_values = dict((key1, None) for key1 in list(dict_dia.keys()))
             diagnostic_units = ""
         else:
             dict_dia = data_json["value"][met]["diagnostic"]
-            diagnostic_values = dict((key1, dict_dia[key1]["value"]) for key1 in dict_dia.keys())
+            diagnostic_values = dict((key1, dict_dia[key1]["value"]) for key1 in list(dict_dia.keys()))
             diagnostic_units = data_json["metadata"]["metrics"][met]["diagnostic"]["units"]
         # get metric values computed with the given model and observations
         if metric_collection == "ENSO_tel" and "Map" in met:
@@ -88,11 +88,11 @@ for met in metrics:
             list1, list2 = [met+"Corr", met+"Rmse"], ["metric", "metric"]
             dict_met = data_json["value"]
             metric_values = dict((key1, {model: [dict_met[su][ty][key1]["value"] for su, ty in zip(list1, list2)]})
-                                 for key1 in dict_met[list1[0]]["metric"].keys())
+                                 for key1 in list(dict_met[list1[0]]["metric"].keys()))
             metric_units = [data_json["metadata"]["metrics"][su]["metric"]["units"] for su in list1]
         else:
             dict_met = data_json["value"][met]["metric"]
-            metric_values = dict((key1, {model: dict_met[key1]["value"]}) for key1 in dict_met.keys())
+            metric_values = dict((key1, {model: dict_met[key1]["value"]}) for key1 in list(dict_met.keys()))
             metric_units = data_json["metadata"]["metrics"][met]["metric"]["units"]
         # figure name
         figure_name = project + "_" + experiment + "_" + metric_collection + "_" + model + "_" + member + "_" + met

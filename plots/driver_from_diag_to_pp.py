@@ -60,13 +60,13 @@ def add_suffix(list_met):
 
 
 def common_save(dict_in, dict_out={}):
-    for mod in dict_in.keys():
+    for mod in list(dict_in.keys()):
         try:
             dict_out[mod]
         except:
             dict_out[mod] = dict_in[mod]
         else:
-            for met in dict_in[mod].keys():
+            for met in list(dict_in[mod].keys()):
                 try:
                     dict_out[mod][met]
                 except:
@@ -86,7 +86,7 @@ def common_save(dict_in, dict_out={}):
 
 def get_ref(metric):
     for mc in metric_collection:
-        list_met = sorted(defCollection(mc)['metrics_list'].keys(), key=lambda v: v.upper())
+        list_met = sorted(list(defCollection(mc)['metrics_list'].keys()), key=lambda v: v.upper())
         if mc == "ENSO_tel" and "Map" in metric:
             my_met = metric.replace("Corr", "").replace("Rmse", "")
         else:
@@ -174,7 +174,7 @@ for proj in list_project:
         dict_di, dict_me = dict(), dict()
     for mc in metric_collection:
         # get metrics list
-        list_metrics = sorted(defCollection(mc)['metrics_list'].keys(), key=lambda v: v.upper())
+        list_metrics = sorted(list(defCollection(mc)['metrics_list'].keys()), key=lambda v: v.upper())
         if reduced_set is True:
             if mc == "ENSO_perf":
                 to_remove = ['BiasSstLatRmse', 'BiasTauxLatRmse', 'EnsoPrTsRmse', 'EnsoTauxTsRmse',
@@ -234,13 +234,13 @@ for proj in list_project:
         # units
         if proj == "cmip5":
             dicttmp = data["RESULTS"]["model"]["CNRM-CM5"]["metadata"]["metrics"]
-            keystmp = dicttmp.keys()
+            keystmp = list(dicttmp.keys())
             for met in keystmp:
                 uni = dicttmp[met]["metric"]["units"] if ("Rmse" in met or "Corr" in met)\
                     else dicttmp[met]["diagnostic"]["units"]
                 dict_uni[met] = uni.replace("C", "$^\circ$C").replace("long", "$^\circ$long")
             del dicttmp, keystmp
-        list_models = sorted(data["RESULTS"]["model"].keys(), key=lambda v: v.upper())
+        list_models = sorted(list(data["RESULTS"]["model"].keys()), key=lambda v: v.upper())
         # read metrics
         dict11, dict12 = dict(), dict()
         for mod in list_models:
@@ -250,13 +250,13 @@ for proj in list_project:
                     dicttmp1 = data["RESULTS"]["model"]["CNRM-CM5"]["value"][met]["metric"]
                 else:
                     dicttmp1 = data["RESULTS"]["model"]["CNRM-CM6-1"]["value"][met]["metric"]
-                keystmp = dicttmp1.keys()
+                keystmp = list(dicttmp1.keys())
                 # metric
                 try: data["RESULTS"]["model"][mod]["value"][met]["metric"]
                 except: tmp = dict((key1, 1e20) for key1 in keystmp)
                 else:
                     dicttmp2 = data["RESULTS"]["model"][mod]["value"][met]["metric"]
-                    tmp = dict((key1, 1e20 if (key1 not in dicttmp2.keys() or dicttmp2[key1]["value"] is None) else
+                    tmp = dict((key1, 1e20 if (key1 not in list(dicttmp2.keys()) or dicttmp2[key1]["value"] is None) else
                                 dicttmp2[key1]["value"]) for key1 in keystmp)
                 dict21[met] = tmp
                 # diagnostic
@@ -268,7 +268,7 @@ for proj in list_project:
                 except: tmp = dict((key1, 1e20 if key1 == mod else dicttmp1[key1]["value"]) for key1 in keystmp + [mod])
                 else:
                     dicttmp2 = data["RESULTS"]["model"][mod]["value"][met]["diagnostic"]
-                    tmp = dict((key1, dicttmp1[key1]["value"] if (key1 not in dicttmp2.keys() and key1 != mod) else
+                    tmp = dict((key1, dicttmp1[key1]["value"] if (key1 not in list(dicttmp2.keys()) and key1 != mod) else
                                 (1e20 if dicttmp2[key1]["value"] is None else dicttmp2[key1]["value"]))
                                for key1 in keystmp + [mod])
                 dict22[met] = tmp
@@ -291,64 +291,64 @@ if big_ensemble is True:
 
 
 # show dictionary levels
-lev1 = sorted(dict_met.keys(), key=lambda v: v.upper())
-print "level1 (" + str(len(lev1)) + ") = " + str(lev1)
-print ""
+lev1 = sorted(list(dict_met.keys()), key=lambda v: v.upper())
+print("level1 (" + str(len(lev1)) + ") = " + str(lev1))
+print("")
 # check metrics
 if big_ensemble is True:
-    list1 = list(set([len(dict_met[key1].keys()) for key1 in lev1]))
+    list1 = list(set([len(list(dict_met[key1].keys())) for key1 in lev1]))
     for key1 in lev1:
-        if len(dict_met[key1].keys()) == max(list1):
-            list_metrics = sorted(dict_met[key1].keys(), key=lambda v: v.upper())
+        if len(list(dict_met[key1].keys())) == max(list1):
+            list_metrics = sorted(list(dict_met[key1].keys()), key=lambda v: v.upper())
             pass
     # !!!!! temporary: start !!!!!
     # some models are not used in all metric collection (ask jiwoo)
     for key2 in list_metrics:
         for key1 in lev1:
-            if key2 not in dict_met[key1].keys():
-                dict_met[key1][key2] = dict((ref, 1e20) for ref in dict_met["ACCESS1-0"][key2].keys())
-    list1 = list(set([len(dict_met[key1].keys()) for key1 in lev1]))
+            if key2 not in list(dict_met[key1].keys()):
+                dict_met[key1][key2] = dict((ref, 1e20) for ref in list(dict_met["ACCESS1-0"][key2].keys()))
+    list1 = list(set([len(list(dict_met[key1].keys())) for key1 in lev1]))
     # !!!!! temporary: end !!!!!
     # !!!!! temporary: start !!!!!
     # some models are not used in all metric collection (ask jiwoo)
     for key2 in list_metrics:
         for key1 in lev1:
-            if key2 not in dict_dia[key1].keys():
-                dict_dia[key1][key2] = dict((ref, 1e20) for ref in dict_dia["ACCESS1-0"][key2].keys())
+            if key2 not in list(dict_dia[key1].keys()):
+                dict_dia[key1][key2] = dict((ref, 1e20) for ref in list(dict_dia["ACCESS1-0"][key2].keys()))
     # !!!!! temporary: end !!!!!
 else:
-    list1 = list(set([len(dict_met[key1][key2].keys()) for key1 in lev1 for key2 in dict_met[key1].keys()]))
+    list1 = list(set([len(list(dict_met[key1][key2].keys())) for key1 in lev1 for key2 in list(dict_met[key1].keys())]))
     for key1 in lev1:
-        for key2 in dict_met[key1].keys():
-            if len(dict_met[key1][key2].keys()) == max(list1):
-                list_metrics = sorted(dict_met[key1][key2].keys(), key=lambda v: v.upper())
+        for key2 in list(dict_met[key1].keys()):
+            if len(list(dict_met[key1][key2].keys())) == max(list1):
+                list_metrics = sorted(list(dict_met[key1][key2].keys()), key=lambda v: v.upper())
                 pass
     # !!!!! temporary: start !!!!!
     # some models are not used in all metric collection (ask jiwoo)
     for key3 in list_metrics:
         for key1 in lev1:
-            for key2 in dict_met[key1].keys():
-                if key3 not in dict_met[key1][key2].keys():
+            for key2 in list(dict_met[key1].keys()):
+                if key3 not in list(dict_met[key1][key2].keys()):
                     if isinstance(dict_met["cmip5"]["ACCESS1-0"][key3], dict):
                         dict_met[key1][key2][key3] = dict((ref, 1e20)
-                                                          for ref in dict_met["cmip5"]["ACCESS1-0"][key3].keys())
+                                                          for ref in list(dict_met["cmip5"]["ACCESS1-0"][key3].keys()))
                     else:
                         dict_met[key1][key2][key3] = 1e20
-    list1 = list(set([len(dict_met[key1][key2].keys()) for key1 in lev1 for key2 in dict_met[key1].keys()]))
+    list1 = list(set([len(list(dict_met[key1][key2].keys())) for key1 in lev1 for key2 in list(dict_met[key1].keys())]))
     # !!!!! temporary: end !!!!!
 if len(list1) != 1:
     for key1 in lev1:
-        lev2 = sorted(dict_met[key1].keys(), key=lambda v: v.upper())
+        lev2 = sorted(list(dict_met[key1].keys()), key=lambda v: v.upper())
         if big_ensemble is True:
             if len(lev2) != len(list_metrics):
-                print key1.rjust(15) + " (" + str(len(lev2)).zfill(2) + "), missing = " +\
-                      str(list(set(list_metrics) - set(lev2)))
+                print(key1.rjust(15) + " (" + str(len(lev2)).zfill(2) + "), missing = " +\
+                      str(list(set(list_metrics) - set(lev2))))
         else:
             for key2 in lev2:
-                lev3 = sorted(dict_met[key1][key2].keys(), key=lambda v: v.upper())
+                lev3 = sorted(list(dict_met[key1][key2].keys()), key=lambda v: v.upper())
                 if len(lev3) != len(list_metrics):
-                    print key2.rjust(15) + " (" + str(len(lev3)).zfill(2) + "), missing = " +\
-                          str(list(set(list_metrics) - set(lev3)))
+                    print(key2.rjust(15) + " (" + str(len(lev3)).zfill(2) + "), missing = " +\
+                          str(list(set(list_metrics) - set(lev3))))
                 del lev3
         del lev2
     list_strings = [
@@ -358,9 +358,9 @@ if len(list1) != 1:
     ]
     EnsoErrorsWarnings.my_error(list_strings)
 else:
-    print str().ljust(5) + "metrics (" + str(len(list_metrics)) + ") = " + str(list_metrics)
+    print(str().ljust(5) + "metrics (" + str(len(list_metrics)) + ") = " + str(list_metrics))
 del list1
-for ii in range(3): print ""
+for ii in range(3): print("")
 
 
 # ---------------------------------------------------#
@@ -395,14 +395,14 @@ if ' ':
                 tname = "correlation"
                 xlabel = deepcopy(met)
                 my_text = "1 - corr"
-                val = [list2[ii][mod][met][ref] for mod in list2[ii].keys() if list2[ii][mod][met][ref] < 1e15]
+                val = [list2[ii][mod][met][ref] for mod in list(list2[ii].keys()) if list2[ii][mod][met][ref] < 1e15]
                 obs = 1
             else:
                 tname = "scalar"
                 xlabel = met + "\n(" + dict_uni[met] + ")"
                 my_text = r'$\vert\frac{mod - obs}{obs}\vert$'
-                val = [list2[ii][mod][met][mod] for mod in list2[ii].keys() if list2[ii][mod][met][mod] < 1e15]
-                obs = list2[ii][list2[ii].keys()[0]][met][ref]
+                val = [list2[ii][mod][met][mod] for mod in list(list2[ii].keys()) if list2[ii][mod][met][mod] < 1e15]
+                obs = list2[ii][list(list2[ii].keys())[0]][met][ref]
             my_ylim = mimadict[met]
             parallelplot(val, obs, ind=nbr, labels=xlabel, title=tname, colors=my_col, legend=my_leg,
                          plot_legend=False, ylim=my_ylim)
@@ -414,7 +414,7 @@ if ' ':
         if "Rmse" in met:
             xlabel = met + "\n(" + dict_uni[met] + ")"
             my_ylim = mimadict[met]
-            val = [list2[ii][mod][met][ref] for mod in list2[ii].keys() if list2[ii][mod][met][ref] < 1e15]
+            val = [list2[ii][mod][met][ref] for mod in list(list2[ii].keys()) if list2[ii][mod][met][ref] < 1e15]
             uptitle = ""
         elif "Corr" in met:
             xlabel = "error"

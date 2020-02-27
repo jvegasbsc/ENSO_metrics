@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from cdms2 import open as CDMS2open
 from copy import deepcopy
@@ -47,7 +47,7 @@ netcdf_path = '/data/yplanton/ENSO_metrics/v20190805'
 
 
 def find_xml(name, frequency, variable, project='', experiment='', ensemble='', realm=''):
-    list_obs = ReferenceObservations().keys()
+    list_obs = list(ReferenceObservations().keys())
     if name in list_obs:
         file_name, file_area, file_land = find_xml_obs(name, frequency, variable)
     else:
@@ -112,7 +112,7 @@ def find_fx(model, project='', experiment='', ensemble='', realm=''):
 
 
 def find_xml_fx(name, project='', experiment='', realm=''):
-    list_obs = ReferenceObservations().keys()
+    list_obs = list(ReferenceObservations().keys())
     if name in list_obs:
         file_area = OSpath__join(xmldir, 'obs_' + str(name) + '_areacell.xml')
         file_land = OSpath__join(xmldir, 'obs_' + str(name) + '_landmask.xml')
@@ -150,7 +150,7 @@ def save_json(dict_in, json_name, metric_only=True):
         for ens in liste:
             # metadata (nyears)
             dict_meta = dict()
-            for key1 in dict_in[ens]['metadata']['metrics'][met]['diagnostic'].keys():
+            for key1 in list(dict_in[ens]['metadata']['metrics'][met]['diagnostic'].keys()):
                 if key1 not in ['time_frequency', 'ref', 'method', 'method_nonlinearity', 'name']:
                     if key1 == "units":
                         dict_meta[key1] = dict_in[ens]['metadata']['metrics'][met]['diagnostic'][key1]
@@ -160,7 +160,7 @@ def save_json(dict_in, json_name, metric_only=True):
             if metric_only is True:
                 # metrics
                 dict2 = dict()
-                for key1 in dict_in[ens]['value'][met]['metric'].keys():
+                for key1 in list(dict_in[ens]['value'][met]['metric'].keys()):
                     tmp = dict_in[ens]['value'][met]['metric'][key1]['value']
                     tmp_key = key1.replace("ref_", "")
                     dict2[tmp_key] = {'metric': tmp, 'nyears_obs': dict_meta[tmp_key], 'units': units}
@@ -168,13 +168,13 @@ def save_json(dict_in, json_name, metric_only=True):
             else:
                 # metrics
                 dict2 = {'metric': {}, 'diagnostic': {}}
-                for key1 in dict_in[ens]['value'][met]['metric'].keys():
+                for key1 in list(dict_in[ens]['value'][met]['metric'].keys()):
                     tmp = dict_in[ens]['value'][met]['metric'][key1]['value']
                     tmp_key = key1.replace("ref_", "")
                     dict2['metric'][tmp_key] = {'value': tmp, 'nyears_obs': dict_meta[tmp_key], 'units': units}
                     del tmp, tmp_key
                 # dive down diagnostics
-                for key1 in dict_in[ens]['value'][met]['diagnostic'].keys():
+                for key1 in list(dict_in[ens]['value'][met]['diagnostic'].keys()):
                     tmp = dict_in[ens]['value'][met]['diagnostic'][key1]['value']
                     if key1 == 'model':
                         dict2['diagnostic'][ens] = \
@@ -217,7 +217,7 @@ print('\033[95m' + str(list_variables) + '\033[0m')
 list_obs = list()
 for metric in list_metric:
     dict_var_obs = dict_mc['metrics_list'][metric]['obs_name']
-    for var in dict_var_obs.keys():
+    for var in list(dict_var_obs.keys()):
         for obs in dict_var_obs[var]:
             if obs not in list_obs:
                 list_obs.append(obs)

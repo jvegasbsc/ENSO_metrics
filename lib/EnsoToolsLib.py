@@ -1,6 +1,6 @@
 # -*- coding:UTF-8 -*-
 # ENSO_metrics package functions:
-from EnsoCollectionsLib import ReferenceRegions
+from .EnsoCollectionsLib import ReferenceRegions
 
 
 # ---------------------------------------------------------------------------------------------------------------------#

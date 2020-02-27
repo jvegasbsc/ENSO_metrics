@@ -367,18 +367,18 @@ for mc in metric_collections:
         # open and read json file
         filename_js, data_json = read_data(proj, mc)
         # read metrics
-        list_models = sorted(data_json.keys(), key=lambda v: v.upper())
+        list_models = sorted(list(data_json.keys()), key=lambda v: v.upper())
         dict_mod[proj] = list_models
         for mod in list_models:
             data_mod = data_json[mod]["value"]
-            list_metrics = sorted(data_mod.keys(), key=lambda v: v.upper())
+            list_metrics = sorted(list(data_mod.keys()), key=lambda v: v.upper())
             list_metrics = remove_metrics(list_metrics, mc)
             dict2 = dict()
             for met in list_metrics:
                 try: ref = get_reference(mc, met)
                 except: ref = "Tropflux"
                 data_met = data_mod[met]["metric"]
-                list_ref = sorted(data_met.keys(), key=lambda v: v.upper())
+                list_ref = sorted(list(data_met.keys()), key=lambda v: v.upper())
                 if ref in list_ref:
                     my_ref = deepcopy(ref)
                 else:
@@ -452,8 +452,8 @@ for mc in metric_collections:
         except: pass
         else:
             try: my_metrics
-            except: my_metrics = dict1[mod].keys()
-            else: my_metrics += dict1[mod].keys()
+            except: my_metrics = list(dict1[mod].keys())
+            else: my_metrics += list(dict1[mod].keys())
     my_metrics = sorted(list(set(my_metrics)), key=lambda v: v.upper())
     if mc == "ENSO_perf":
         my_metrics = [
@@ -503,7 +503,7 @@ for mc in metric_collections:
         tab[len(my_models) + 2, jj] = 0
         # tab[:, jj] = (tab[:, jj] - med) / med
         tab[:, jj] = (tab[:, jj] - mea) / std
-        print met.rjust(20) + " = " + str(round(med, 1))
+        print(met.rjust(20) + " = " + str(round(med, 1)))
         del mea, med, sel1, sel2, tmp
     tab = NUMPYmoveaxis(tab, 0, 1)
     # plot

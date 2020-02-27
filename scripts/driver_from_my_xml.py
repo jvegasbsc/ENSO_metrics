@@ -1,4 +1,4 @@
-from __future__ import print_function
+
 
 from cdms2 import open as CDMS2open
 from os.path import join as join_path
@@ -13,7 +13,7 @@ from EnsoMetrics.EnsoComputeMetricsLib import compute_collection
 xmldir = environ['XMLDIR']
 
 def find_xml(name, frequency, variable, project='', experiment='', ensemble='', realm=''):
-    list_obs = ReferenceObservations().keys()
+    list_obs = list(ReferenceObservations().keys())
     if name in list_obs:
         file_name, file_area, file_land = find_xml_obs(name, frequency, variable)
     else:
@@ -49,7 +49,7 @@ def find_xml_cmip(model, project, experiment, ensemble, frequency, realm, variab
     return file_name, file_area, file_land
 
 def find_xml_fx(name, project='', experiment='', realm=''):
-    list_obs = ReferenceObservations().keys()
+    list_obs = list(ReferenceObservations().keys())
     if name in list_obs:
         file_area = join_path(xmldir, 'obs_' + str(name) + '_glob_fx_O_areacell.xml')
         file_land = join_path(xmldir, 'obs_' + str(name) + '_glob_fx_O_landmask.xml')
@@ -103,7 +103,7 @@ print('\033[95m' + str(list_variables) + '\033[0m')
 list_obs = list()
 for metric in list_metric:
     dict_var_obs = dict_mc['metrics_list'][metric]['obs_name']
-    for var in dict_var_obs.keys():
+    for var in list(dict_var_obs.keys()):
         for obs in dict_var_obs[var]:
             if obs not in list_obs:
                 list_obs.append(obs)
@@ -244,6 +244,6 @@ for mod in list_models:
     netcdf_name = "yplanton_" + mc_name + "_" + mod
     netcdf = join_path(netcdf_path, netcdf_name)
     dict_metric[mod], _ = compute_collection(mc_name, dictDatasets, mod, netcdf=True, netcdf_name=netcdf, debug=True)
-    tmp = sorted(dict_metric[mod]['value'].keys(), key=lambda v: v.upper())
+    tmp = sorted(list(dict_metric[mod]['value'].keys()), key=lambda v: v.upper())
     for kk in tmp:
         print(kk.ljust(13) + ': ' + str(dict_metric[mod]['value'][kk]['metric']))

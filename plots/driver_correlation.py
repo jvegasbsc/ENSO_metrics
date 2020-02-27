@@ -64,13 +64,13 @@ def add_suffix(list_met):
 
 
 def common_save(dict_in, dict_out={}):
-    for mod in dict_in.keys():
+    for mod in list(dict_in.keys()):
         try:
             dict_out[mod]
         except:
             dict_out[mod] = dict_in[mod]
         else:
-            for met in dict_in[mod].keys():
+            for met in list(dict_in[mod].keys()):
                 try:
                     dict_out[mod][met]
                 except:
@@ -135,7 +135,7 @@ def get_reference(metric_collection, metric):
 
 def get_ref(metric):
     for mc in metric_collection:
-        list_met = sorted(defCollection(mc)['metrics_list'].keys(), key=lambda v: v.upper())
+        list_met = sorted(list(defCollection(mc)['metrics_list'].keys()), key=lambda v: v.upper())
         if mc == "ENSO_tel" and "Map" in metric:
             my_met = metric.replace("Corr", "").replace("Rmse", "")
         else:
@@ -368,13 +368,13 @@ for proj in list_project:
     for mc in metric_collection:
         # read json
         data_json = read_data(proj, mc)
-        list_models = sorted(data_json.keys(), key=lambda v: v.upper())
+        list_models = sorted(list(data_json.keys()), key=lambda v: v.upper())
         # read metrics
-        list_models = sorted(data_json.keys(), key=lambda v: v.upper())
+        list_models = sorted(list(data_json.keys()), key=lambda v: v.upper())
         dict1 = dict()
         for mod in list_models:
             data_mod = data_json[mod]["value"]
-            list_metrics = sorted(data_mod.keys(), key=lambda v: v.upper())
+            list_metrics = sorted(list(data_mod.keys()), key=lambda v: v.upper())
             list_metrics = remove_metrics(list_metrics, mc)
             dict2 = dict()
             for met in list_metrics:
@@ -383,7 +383,7 @@ for proj in list_project:
                 except:
                     ref = "Tropflux"
                 data_met = data_mod[met]["metric"]
-                list_ref = sorted(data_met.keys(), key=lambda v: v.upper())
+                list_ref = sorted(list(data_met.keys()), key=lambda v: v.upper())
                 my_ref = deepcopy(ref)
                 # if ref in list_ref:
                 #     my_ref = deepcopy(ref)
@@ -545,7 +545,7 @@ if big_ensemble is True:
 # Plot
 # ---------------------------------------------------#
 dict_out = deepcopy(dict_met)
-lev1 = sorted(dict_out.keys(), key=lambda v: v.upper())
+lev1 = sorted(list(dict_out.keys()), key=lambda v: v.upper())
 met_order = [
     "BiasPrLatRmse", "BiasPrLonRmse", "BiasSstLonRmse", "BiasTauxLonRmse", "SeasonalPrLatRmse", "SeasonalPrLonRmse",
     "SeasonalSstLonRmse", "SeasonalTauxLonRmse", "EnsoSstLonRmse", "EnsoSstTsRmse", "EnsoAmpl", "EnsoSeasonality",
@@ -556,8 +556,8 @@ met_order = [
 if ' ':
     if big_ensemble is True:
         dict_out = deepcopy(dict_met)
-        lev1 = sorted(dict_out.keys(), key=lambda v: v.upper())
-        list_metrics = sorted(dict_out[lev1[0]].keys(), key=lambda v: v.upper())
+        lev1 = sorted(list(dict_out.keys()), key=lambda v: v.upper())
+        list_metrics = sorted(list(dict_out[lev1[0]].keys()), key=lambda v: v.upper())
         list_metrics = [met for met in met_order if met in list_metrics]
         tab = NUMPYma__zeros((len(list_metrics), len(lev1)))
         for ii, met in enumerate(list_metrics):
@@ -613,5 +613,5 @@ if '':
          tmp1[ii] < SCIPYstats__scoreatpercentile(tmp1, 50) and tmp10[ii] < SCIPYstats__scoreatpercentile(tmp10, 50)],
     ]
     for ii, tmp in enumerate(selections):
-        print "selection" + str(ii+1).zfill(2) + " (" + str(len(tmp)).zfill(2) + "): "+str(tmp)
+        print("selection" + str(ii+1).zfill(2) + " (" + str(len(tmp)).zfill(2) + "): "+str(tmp))
 

@@ -113,7 +113,7 @@ for proj in list_project:
     alt_json[proj] = data["RESULTS"]["model"]
     del data, ff, filename_js, lpath, lname
 # loop on metrics
-list_metrics = sorted(defCollection(metric_collection)['metrics_list'].keys(), key=lambda v: v.upper())
+list_metrics = sorted(list(defCollection(metric_collection)['metrics_list'].keys()), key=lambda v: v.upper())
 if metric_collection == "ENSO_perf":
     # list_metrics = [
     #     'BiasPrLatRmse', 'BiasPrLonRmse', 'BiasSstLatRmse', 'BiasSstLonRmse', 'BiasTauxLatRmse', 'BiasTauxLonRmse',
@@ -151,13 +151,13 @@ elif metric_collection == "ENSO_tel":
     #     'NinoSstMap_2']
 # loop on metrics
 for met in list_metrics:
-    print met
+    print(met)
     my_data = {"diagnostic_values": {}, "metric_values": {}, "filenames": {}, "models": {}}
     if big_ensemble is False:
         # one ensemble for CMIP5 and one for CMIP6
         for proj in list_project:
             lpath = OSpath__join(path_in, proj + "/" + experiment + "/" + metric_collection)
-            list_models = sorted(data_json[proj].keys(), key=lambda v: v.upper())
+            list_models = sorted(list(data_json[proj].keys()), key=lambda v: v.upper())
             # # one model has wrong wind direction
             # if "BCC-ESM1" in list_models:
             #     if "Taux" in met:
@@ -209,17 +209,17 @@ for met in list_metrics:
                     tab = None
                 else:
                     tab = dict((key1, data_json[proj][list_models[0]]["value"][met]["diagnostic"][key1]["value"])
-                               for key1 in data_json[proj][list_models[0]]["value"][met]["diagnostic"].keys()
+                               for key1 in list(data_json[proj][list_models[0]]["value"][met]["diagnostic"].keys())
                                if key1 != list_models[0])
                 my_data["diagnostic_values"]["obs"] = tab
             # metric values
             if metric_collection == "ENSO_tel" and "Map" in met:
                 dicttmp1 = dict()
-                for key1 in data_json[proj][list_models[0]]["value"][met + "Corr"]["metric"].keys():
+                for key1 in list(data_json[proj][list_models[0]]["value"][met + "Corr"]["metric"].keys()):
                     dicttmp2 = dict()
                     for mod in my_data["models"][proj]:
                         dicttmp2[mod] = [data_json[proj][mod]["value"][met+suffix]["metric"][key1]["value"]
-                                         if key1 in data_json[proj][mod]["value"][met+suffix]["metric"].keys() else None
+                                         if key1 in list(data_json[proj][mod]["value"][met+suffix]["metric"].keys()) else None
                                          for suffix in ["Corr", "Rmse"]]
                     dicttmp1[key1] = dicttmp2
                     del dicttmp2
@@ -233,12 +233,12 @@ for met in list_metrics:
                 #          for key1 in data_json[proj][list_models[0]]["value"][met]["metric"].keys())
                 my_data["metric_values"][proj] = \
                     dict((key1, dict((mod, alt_json[proj][mod]["value"][met]["metric"][key1]["value"]
-                                      if key1 in alt_json[proj][mod]["value"][met]["metric"].keys() else None)
+                                      if key1 in list(alt_json[proj][mod]["value"][met]["metric"].keys()) else None)
                                      for mod in my_data["models"][proj]))
-                         for key1 in alt_json[proj][list_models[0]]["value"][met]["metric"].keys())
+                         for key1 in list(alt_json[proj][list_models[0]]["value"][met]["metric"].keys()))
             del lpath
-            print str().ljust(5) + proj + " " + str(len(tab1)).zfill(2) + " file(s) " + \
-                  str(len(tab2)).zfill(2) + " name(s)"
+            print(str().ljust(5) + proj + " " + str(len(tab1)).zfill(2) + " file(s) " + \
+                  str(len(tab2)).zfill(2) + " name(s)")
             # print tab1
             # print list_models
     else:
@@ -248,8 +248,8 @@ for met in list_metrics:
             tab1, tab2 = list(), list()
             for proj in list_project:
                 lpath = OSpath__join(path_in, proj + "/" + experiment + "/" + metric_collection)
-                list_models = sorted(data_json[proj].keys(), key=lambda v: v.upper())
-                if grp in dict_selection.keys():
+                list_models = sorted(list(data_json[proj].keys()), key=lambda v: v.upper())
+                if grp in list(dict_selection.keys()):
                     my_mod = dict_selection[grp]
                     list_models = [mod for mod in list_models if mod in my_mod]
                     del my_mod
@@ -280,14 +280,14 @@ for met in list_metrics:
                         tab = dict()
                     else:
                         tab = dict((key1, data_json[proj][list_models[0]]["value"][met]["diagnostic"][key1]["value"])
-                                   for key1 in data_json[proj][list_models[0]]["value"][met]["diagnostic"].keys()
+                                   for key1 in list(data_json[proj][list_models[0]]["value"][met]["diagnostic"].keys())
                                    if key1 != list_models[0])
                     my_data["diagnostic_values"]["obs"] = tab
                 # metric values
                 if len(list_models) > 0:
                     if metric_collection == "ENSO_tel" and "Map" in met:
                         for suffix in ["Corr", "Rmse"]:
-                            for key1 in data_json[proj][list_models[0]]["value"][met+suffix]["metric"].keys():
+                            for key1 in list(data_json[proj][list_models[0]]["value"][met+suffix]["metric"].keys()):
                                 try:
                                     dict2
                                 except:
@@ -300,7 +300,7 @@ for met in list_metrics:
                                     except:
                                         dict2[key1] = dict(
                                             (mod, [data_json[proj][mod]["value"][met+suffix]["metric"][key1]["value"]]
-                                             if key1 in data_json[proj][mod]["value"][met+suffix]["metric"].keys()
+                                             if key1 in list(data_json[proj][mod]["value"][met+suffix]["metric"].keys())
                                              else [None]) for mod in tmp)
                                     else:
                                         for mod in tmp:
@@ -308,9 +308,9 @@ for met in list_metrics:
                                             try:
                                                 dict2[key1][mod]
                                             except:
-                                                dict2[key1][mod] = [dmp[key1]["value"] if key1 in dmp.keys() else None]
+                                                dict2[key1][mod] = [dmp[key1]["value"] if key1 in list(dmp.keys()) else None]
                                             else:
-                                                dict2[key1][mod] += [dmp[key1]["value"] if key1 in dmp.keys() else None]
+                                                dict2[key1][mod] += [dmp[key1]["value"] if key1 in list(dmp.keys()) else None]
                     else:
                         # for key1 in data_json[proj][list_models[0]]["value"][met]["metric"].keys():
                         #     try:
@@ -332,13 +332,13 @@ for met in list_metrics:
                         #             for mod in tmp:
                         #                 dict2[key1][mod] = data_json[proj][mod]["value"][met]["metric"][key1]["value"]\
                         #                     if key1 in data_json[proj][mod]["value"][met]["metric"].keys() else None
-                        for key1 in alt_json[proj][list_models[0]]["value"][met]["metric"].keys():
+                        for key1 in list(alt_json[proj][list_models[0]]["value"][met]["metric"].keys()):
                             try:
                                 dict2
                             except:
                                 dict2 = {key1: dict(
                                     (mod, alt_json[proj][mod]["value"][met]["metric"][key1]["value"]
-                                     if key1 in alt_json[proj][mod]["value"][met]["metric"].keys() else None)
+                                     if key1 in list(alt_json[proj][mod]["value"][met]["metric"].keys()) else None)
                                     for mod in tmp)}
                             else:
                                 try:
@@ -346,31 +346,31 @@ for met in list_metrics:
                                 except:
                                     dict2[key1] = dict(
                                         (mod, alt_json[proj][mod]["value"][met]["metric"][key1]["value"]
-                                         if key1 in alt_json[proj][mod]["value"][met]["metric"].keys() else None)
+                                         if key1 in list(alt_json[proj][mod]["value"][met]["metric"].keys()) else None)
                                         for mod in tmp)
                                 else:
                                     for mod in tmp:
                                         dict2[key1][mod] =\
                                             alt_json[proj][mod]["value"][met]["metric"][key1]["value"]\
-                                                if key1 in alt_json[proj][mod]["value"][met]["metric"].keys() else None
+                                                if key1 in list(alt_json[proj][mod]["value"][met]["metric"].keys()) else None
                 del lpath, tmp
             my_data["diagnostic_values"][grp] = dict1
             my_data["metric_values"][grp] = dict2
             my_data["filenames"][grp] = tab1
             my_data["models"][grp] = tab2
-            print str().ljust(5) + grp + " " + str(len(tab1)).zfill(2) + " file(s) " + \
-                  str(len(tab2)).zfill(2) + " name(s)"
+            print(str().ljust(5) + grp + " " + str(len(tab1)).zfill(2) + " file(s) " + \
+                  str(len(tab2)).zfill(2) + " name(s)")
     if metric_collection == "ENSO_tel" and "Map" in met:
         units = ""
     else:
-        units = data_json[proj][data_json[proj].keys()[0]]["metadata"]["metrics"][met]["diagnostic"]["units"]
+        units = data_json[proj][list(data_json[proj].keys())[0]]["metadata"]["metrics"][met]["diagnostic"]["units"]
     my_data["diagnostic_units"] = units  # .replace("C", "$^\circ$C").replace("long", "$^\circ$long")
     if metric_collection == "ENSO_tel" and "Map" in met:
-        units = [data_json[proj][data_json[proj].keys()[0]]["metadata"]["metrics"][met+suffix]["metric"]["units"]
+        units = [data_json[proj][list(data_json[proj].keys())[0]]["metadata"]["metrics"][met+suffix]["metric"]["units"]
                  for suffix in ["Corr", "Rmse"]]
         # units = [uni.replace("C", "$^\circ$C").replace("long", "$^\circ$long") for uni in units]
     else:
-        units = data_json[proj][data_json[proj].keys()[0]]["metadata"]["metrics"][met]["metric"]["units"]
+        units = data_json[proj][list(data_json[proj].keys())[0]]["metadata"]["metrics"][met]["metric"]["units"]
         if "Corr" not in met and "Rmse" not in met:
             units = "%"
         # units = units.replace("C", "$^\circ$C").replace("long", "$^\circ$long")

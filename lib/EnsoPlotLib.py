@@ -5,8 +5,8 @@
 from copy import deepcopy
 from numpy import arange as NUMPYarange
 # ENSO_metrics functions
-from EnsoCollectionsLib import defCollection
-from KeyArgLib import DefaultArgValues
+from .EnsoCollectionsLib import defCollection
+from .KeyArgLib import DefaultArgValues
 
 
 dict_colorbar = {

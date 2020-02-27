@@ -1,5 +1,5 @@
 # -*- coding:UTF-8 -*-
-from __future__ import print_function
+
 from calendar import monthrange
 from copy import deepcopy
 from inspect import stack as INSPECTstack
@@ -10,9 +10,9 @@ from os.path import isfile as OSpath__isfile
 from scipy.signal import detrend as SCIPYsignal_detrend
 
 # ENSO_metrics package functions:
-from EnsoCollectionsLib import ReferenceRegions
-import EnsoErrorsWarnings
-from EnsoToolsLib import add_up_errors, closest_grid
+from .EnsoCollectionsLib import ReferenceRegions
+from . import EnsoErrorsWarnings
+from .EnsoToolsLib import add_up_errors, closest_grid
 
 # CDAT based functions:
 from cdms2 import createAxis as CDMS2createAxis
@@ -81,7 +81,7 @@ def average_horizontal(tab, areacell=None, region=None, **kwargs):
             print("\033[93m" + str().ljust(20) + "axes = " + str(snum) + "\033[0m")
             try: averaged_tab = cdutil.averager(tab, axis=snum, weights='weighted', action='average')
             except:
-                if 'regridding' not in kwargs.keys() or isinstance(kwargs['regridding'], dict) is False:
+                if 'regridding' not in list(kwargs.keys()) or isinstance(kwargs['regridding'], dict) is False:
                     kwargs2 = {'regridder': 'cdms', 'regridTool': 'esmf', 'regridMethod': 'linear',
                                'newgrid_name': 'generic_1x1deg'}
                 else:
@@ -135,7 +135,7 @@ def average_meridional(tab, areacell=None, region=None, **kwargs):
             print("\033[93m" + str().ljust(20) + "axes = " + str(snum) + "\033[0m")
             try: averaged_tab = cdutil.averager(tab, axis=snum, weights='weighted', action='average')
             except:
-                if 'regridding' not in kwargs.keys() or isinstance(kwargs['regridding'], dict) is False:
+                if 'regridding' not in list(kwargs.keys()) or isinstance(kwargs['regridding'], dict) is False:
                     kwargs2 = {'regridder': 'cdms', 'regridTool': 'esmf', 'regridMethod': 'linear',
                                'newgrid_name': 'generic_1x1deg'}
                 else:
@@ -222,7 +222,7 @@ def average_zonal(tab, areacell=None, region=None, **kwargs):
             print("\033[93m" + str().ljust(20) + "axes = " + str(snum) + "\033[0m")
             try: averaged_tab = cdutil.averager(tab, axis=snum, weights='weighted', action='average')
             except:
-                if 'regridding' not in kwargs.keys() or isinstance(kwargs['regridding'], dict) is False:
+                if 'regridding' not in list(kwargs.keys()) or isinstance(kwargs['regridding'], dict) is False:
                     kwargs2 = {'regridder': 'cdms', 'regridTool': 'esmf', 'regridMethod': 'linear',
                                'newgrid_name': 'generic_1x1deg'}
                 else:
@@ -774,16 +774,16 @@ def compute_annual_cycle(tab):
     months = MV2array(list(tt.month for tt in time_ax))
     cyc = []
     for ii in range(12):
-        ids = MV2compress(months == (ii + 1), range(len(tab)))
+        ids = MV2compress(months == (ii + 1), list(range(len(tab))))
         tmp = MV2take(tab, ids, axis=0)
         # tmp = tab.compress(months == (ii + 1), axis=0)
         tmp = MV2average(tmp, axis=0)
         cyc.append(tmp)
         del tmp
-    time = CDMS2createAxis(range(12), id='time')
+    time = CDMS2createAxis(list(range(12)), id='time')
     moy = CDMS2createVariable(MV2array(cyc), axes=[time] + axes[1:], grid=tab.getGrid(), attributes=tab.attributes)
     moy = moy.reorder(initial_order)
-    time = CDMS2createAxis(range(12), id='months')
+    time = CDMS2createAxis(list(range(12)), id='months')
     moy.setAxis(get_num_axis(moy, 'time'), time)
     return moy
 
@@ -898,7 +898,7 @@ def compute_regrid(tab_to_regrid, new_grid, missing=None, order=None, mask=None,
                 str().ljust(10) + "known regridMethod: " + str(list_method)]
             EnsoErrorsWarnings.my_error(list_strings)
     # test the given 'new_grid'
-    if isinstance(new_grid, str) is True or isinstance(new_grid, basestring) is True or new_grid is None:
+    if isinstance(new_grid, str) is True or isinstance(new_grid, str) is True or new_grid is None:
         #
         # new_grid is not a grid, so a grid will be created
         # to do this, kwargs['newgrid_name'] and kwargs['region'] must be defined
@@ -1005,7 +1005,7 @@ def create_time_axis_not_called_time(tab, new_time_name, frequency):
         freq = 'years'
     else:
         EnsoErrorsWarnings.unknown_frequency(frequency, INSPECTstack())
-    axis = CDMS2createAxis(range(len(tab_out)), id=new_time_name)
+    axis = CDMS2createAxis(list(range(len(tab_out))), id=new_time_name)
     axis.units = freq + " since " + str(year1) + "-" + str(month1) + "-" + str(day1)
     axis.axis = freq
     tab_out.setAxis(time_num, axis)
@@ -1252,7 +1252,7 @@ def read_and_select_region(filename, var_name, region=None, time_bounds=None, fr
         # sometimes the time boundaries are wrong, even with 'time=time_bounds'
         # this section checks if one time step has not been included by error at the beginning or the end of the time
         # series
-        if isinstance(time_bounds[0], str) is True or isinstance(time_bounds[0], basestring) is True:
+        if isinstance(time_bounds[0], str) is True or isinstance(time_bounds[0], str) is True:
             if str(tab.getTime().asComponentTime()[0]) < time_bounds[0]:
                 tab = tab[1:]
             if str(tab.getTime().asComponentTime()[-1]) > time_bounds[1]:
@@ -1498,7 +1498,7 @@ def save_netcdf(netcdf_name, var1=None, var1_attributes={}, var1_name='', var1_t
         if var12_time_name is not None:
             var12 = create_time_axis_not_called_time(var12, var12_time_name, frequency)
         o.write(var12, attributes=var12_attributes, dtype='float32', id=var12_name)
-    for att in global_attributes.keys():
+    for att in list(global_attributes.keys()):
         o.__setattr__(att, global_attributes[att])
     o.close()
     return
@@ -1534,7 +1534,7 @@ def smooth_gaussian(tab, axis=0, window=5):
             str().ljust(5) + "axis number too big: " + str(axis)]
         EnsoErrorsWarnings.my_error(list_strings)
     # Reorder tab in order to put 'axis' in first position
-    indices = range(len(tab.shape))
+    indices = list(range(len(tab.shape)))
     indices.remove(axis)
     newOrder = str(axis)
     for ii in indices:
@@ -1606,7 +1606,7 @@ def smooth_square(tab, axis=0, window=5):
             str().ljust(5) + "axis number too big: " + str(axis)]
         EnsoErrorsWarnings.my_error(list_strings)
     # Reorder tab in order to put 'axis' in first position
-    indices = range(len(tab.shape))
+    indices = list(range(len(tab.shape)))
     indices.remove(axis)
     newOrder = str(axis)
     for ii in indices:
@@ -1660,7 +1660,7 @@ def smooth_triangle(tab, axis=0, window=5):
             str().ljust(5) + "axis number too big: " + str(axis)]
         EnsoErrorsWarnings.my_error(list_strings)
     # Reorder tab in order to put 'axis' in first position
-    indices = range(len(tab.shape))
+    indices = list(range(len(tab.shape)))
     indices.remove(axis)
     newOrder = str(axis)
     for ii in indices:
@@ -1734,7 +1734,7 @@ def smooth_data(tab, info, axis=0, window=5, method='triangle'):
         list_strings = [
             "ERROR" + EnsoErrorsWarnings.message_formating(INSPECTstack()) + ": smoothing method (running mean)",
             str().ljust(5) + "unkwown smoothing method: " + str(method),
-            str().ljust(10) + "known smoothing method: " + str(sorted(dict_smooth.keys(), key=lambda v: v.upper()))]
+            str().ljust(10) + "known smoothing method: " + str(sorted(list(dict_smooth.keys()), key=lambda v: v.upper()))]
         EnsoErrorsWarnings.my_error(list_strings)
     info = info + ', smoothing using a ' + str(method) + ' shaped window of ' + str(window) + ' points'
     return dict_smooth[method](tab, axis=axis, window=window), info
@@ -1841,9 +1841,9 @@ def pre_process_data(tab, info, areacell=None, average=False, interannual_anomal
             EnsoErrorsWarnings.debug_mode('\033[93m', "EnsoCDATToolsLib PreProcessTS", 20)
             dict_debug = {'axes1':  str([ax.id for ax in tab.getAxisList()]), 'shape1': str(tab.shape)}
             EnsoErrorsWarnings.debug_mode('\033[93m', "averaging to perform: " + str(average), 25, **dict_debug)
-        if isinstance(average, str) is True or isinstance(average, basestring) is True:  # only one average
+        if isinstance(average, str) is True or isinstance(average, str) is True:  # only one average
             try: dict_average[average]
-            except: EnsoErrorsWarnings.unknown_averaging(average, dict_average.keys(), INSPECTstack())
+            except: EnsoErrorsWarnings.unknown_averaging(average, list(dict_average.keys()), INSPECTstack())
             else:
                 tab = dict_average[average](tab, areacell, region=region, **kwargs)
                 if debug is True:
@@ -1852,13 +1852,13 @@ def pre_process_data(tab, info, areacell=None, average=False, interannual_anomal
         elif isinstance(average, list) is True:  # several averaging steps
             for av in average:
                 try: dict_average[av]
-                except: EnsoErrorsWarnings.unknown_averaging(average, dict_average.keys(), INSPECTstack())
+                except: EnsoErrorsWarnings.unknown_averaging(average, list(dict_average.keys()), INSPECTstack())
                 else:
                     tab = dict_average[av](tab, areacell, region=region, **kwargs)
                     if debug is True:
                         dict_debug = {'axes1': str([ax.id for ax in tab.getAxisList()]), 'shape1': str(tab.shape)}
                         EnsoErrorsWarnings.debug_mode('\033[93m', "performed " + str(av), 25, **dict_debug)
-        else: EnsoErrorsWarnings.unknown_averaging(average, dict_average.keys(), INSPECTstack())
+        else: EnsoErrorsWarnings.unknown_averaging(average, list(dict_average.keys()), INSPECTstack())
     return tab, info
 
 

@@ -1,13 +1,13 @@
 # -*- coding:UTF-8 -*-
-from __future__ import print_function
+
 from copy import deepcopy
 from numpy import sqrt as NUMPYsqrt
 
 # ENSO_metrics package functions:
-import EnsoErrorsWarnings
-from EnsoCdatToolsLib import average_meridional, pre_process_data, read_data, compute_regrid, save_netcdf, compute_std,\
+from . import EnsoErrorsWarnings
+from .EnsoCdatToolsLib import average_meridional, pre_process_data, read_data, compute_regrid, save_netcdf, compute_std,\
     get_time_bounds
-from KeyArgLib import DefaultArgValues
+from .KeyArgLib import DefaultArgValues
 
 
 # ---------------------------------------------------------------------------------------------------------------------#
@@ -172,7 +172,7 @@ def EnsoAmpl(sstfile, sstname, sstareafile, sstareaname, sstlandmaskfile, sstlan
             sst1 = compute_std(sst1)
             sst2 = compute_std(sst2)
             # Regridding
-            if 'regridding' not in kwargs.keys():
+            if 'regridding' not in list(kwargs.keys()):
                 kwargs['regridding'] = {'regridder': 'cdms', 'regridTool': 'esmf', 'regridMethod': 'linear',
                                         'newgrid_name': 'generic_1x1deg'}
             else:

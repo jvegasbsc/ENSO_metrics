@@ -19,7 +19,7 @@ from EnsoMetrics import EnsoErrorsWarnings
 
 
 calendar_months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
-observations = sorted(ReferenceObservations().keys(), key=lambda v: v.upper())
+observations = sorted(list(ReferenceObservations().keys()), key=lambda v: v.upper())
 
 
 def create_labels(label_name, label_ticks):
@@ -199,13 +199,13 @@ def read_diag(dict_diag, dict_metric, model, reference, metric_variables, shadin
     else:
         if shading is True:
             diag_mod =\
-                [[dict_diag[mod][mm] for mm in sorted(dict_diag[mod].keys(), key=lambda v: v.upper())] for mod in model]
+                [[dict_diag[mod][mm] for mm in sorted(list(dict_diag[mod].keys()), key=lambda v: v.upper())] for mod in model]
         else:
             diag_mod = [dict_diag[mod] for mod in model]
     if shading is True:
-        my_ref = dict_diag["obs"].keys()
+        my_ref = list(dict_diag["obs"].keys())
     else:
-        my_ref = dict_diag.keys()
+        my_ref = list(dict_diag.keys())
     if reference in my_ref:
         obs = deepcopy(reference)
     else:
@@ -229,7 +229,7 @@ def read_diag(dict_diag, dict_metric, model, reference, metric_variables, shadin
         if shading is True:
             metric_value = [
                 my_average([dict_metric[mod][obs][mm]
-                            for mm in sorted(dict_metric[mod][obs].keys(), key=lambda v: v.upper())],
+                            for mm in sorted(list(dict_metric[mod][obs].keys()), key=lambda v: v.upper())],
                            remove_masked=True)
                 for mod in model]
         else:
@@ -273,7 +273,7 @@ def read_obs(xml, variables_in_xml, metric_variables, varname, dict_metric, mode
 def reader(filename_nc, model, reference, var_to_read, metric_variables, dict_metric, met_in_file=False, met_type=None,
            met_pattern=""):
     ff = open_dataset(filename_nc, decode_times=False)
-    variables_in_file = sorted([var for var in ff.keys()], key=lambda v: v.upper())
+    variables_in_file = sorted([var for var in list(ff.keys())], key=lambda v: v.upper())
     # read model
     tab_mod = list()
     for var in var_to_read:
@@ -311,7 +311,7 @@ def reader(filename_nc, model, reference, var_to_read, metric_variables, dict_me
         tab_obs.append(tab)
     if met_in_file is True:
         if isinstance(met_type, str):
-            for key in ff.attrs.keys():
+            for key in list(ff.attrs.keys()):
                 if met_type + "_" + obs + "_" + met_pattern == key:
                     val = ff.attrs[key]
             try: val
@@ -321,7 +321,7 @@ def reader(filename_nc, model, reference, var_to_read, metric_variables, dict_me
         elif isinstance(met_type, list):
             metval = list()
             for mety in met_type:
-                for key in ff.attrs.keys():
+                for key in list(ff.attrs.keys()):
                     if mety + "_" + obs + "_" + met_pattern == key:
                         val = ff.attrs[key]
                 try: val
