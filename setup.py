@@ -28,7 +28,7 @@ try:
     commit = p.stdout.readlines()[0].split()[1]
 except:
     commit = ""
-f = open("lib/version.py", "w")
+f = open("ensometrics/version.py", "w")
 print("__version__ = '%s'" % Version, file=f)
 print("__git_tag_describe__ = '%s'" % descr, file=f)
 print("__git_sha1__ = '%s'" % commit, file=f)
@@ -44,8 +44,7 @@ setup(
     version=Version,
     description="Library for ENSO Metrics",
     url="https://github.com/eguil/ENSO_metrics",
-    packages=["EnsoMetrics"],
-    package_dir={"EnsoMetrics": "lib"},
+    packages=["ensometrics"],
     scripts=glob.glob("scripts/*.py"),
     data_files=data_files,
     requires=["numpy"],

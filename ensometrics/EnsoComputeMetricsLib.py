@@ -74,26 +74,7 @@ def compute_collection(
         user_regridding = {
             'regridding': {'model_orand_obs': 2, 'regridder': 'cdms', 'regridTool': 'esmf', 'regridMethod': 'linear',
                 'newgrid_name': 'generic 1x1deg'},
-        }
-    :param debug: boolean, optional
-        default value = False debug mode not activated
-        If you want to activate the debug mode set it to True (prints regularly to see the progress of the calculation)
-    :param netcdf: boolean, optional
-        default value = False dive_down are not saved in NetCDFs
-        If you want to save the dive down diagnostics set it to True
-    :param netcdf_name: string, optional
-        default value = '' root name of the saved NetCDFs
-        the name of a metric will be append at the end of the root name
-        e.g., netcdf_name='USER_DATE_METRICCOLLECTION_MODEL'
-
-    :return: MCvalues: dict
-        name of the Metric Collection, Metrics, value, value_error, units, ...
-        MCvalues = {
-            'MetricCollection': {
-                'information about the MetricCollection': 'descriptions',
-                'metrics': {
-                    'metric1': {
-                        'metric_values': {
+        }/scratch/Earth/jvegas/esmvaltool/output/recipe_enso_metrics_20200302_105929/run/ENSOMetrics/main/settings.yml
                             'obsName1': {
                                 'value': 'value of the metric',
                                 'value_error': 'estimation of the error on the metric',
@@ -1044,14 +1025,6 @@ def compute_metric(
                             modelFile1,
                             modelVarName1,
                             modelFileArea1,
-                            modelAreaName1,
-                            modelFileLandmask1,
-                            modelLandmaskName1,
-                            modelFile2,
-                            modelVarName2,
-                            modelFileArea2,
-                            modelAreaName2,
-                            modelFileLandmask2,
                             modelLandmaskName2,
                             obsFile1[ii],
                             obsVarName1[ii],
@@ -1067,11 +1040,6 @@ def compute_metric(
                             obsLandmaskName2[jj],
                             regionVar1,
                             regionVar2,
-                            dataset1=modelName,
-                            dataset2=output_name,
-                            debug=debug,
-                            netcdf=netcdf,
-                            netcdf_name=netcdf_name,
                             metname=tmp_metric,
                             **keyarg
                         )
